@@ -1,0 +1,21 @@
+{
+	"name": "iCost",
+	"build": {
+		"context": "..",
+		"dockerfile": "Dockerfile"
+	},
+	"runArgs": [
+		"--privileged",
+		"--dns=8.8.8.8"
+	],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"dbaeumer.vscode-eslint",
+				"octref.vetur"
+			]
+		}
+	},
+	"forwardPorts": [8080],
+	"remoteUser": "root"
+}
