@@ -5,17 +5,29 @@
 		"dockerfile": "Dockerfile"
 	},
 	"runArgs": [
-		"--privileged",
-		"--dns=8.8.8.8"
+		"--privileged"
 	],
 	"customizations": {
 		"vscode": {
 			"extensions": [
 				"dbaeumer.vscode-eslint",
-				"octref.vetur"
+				"octref.vetur",
+				"GitHub.copilot",
+				"eamodio.gitlens",
+				"steoates.autoimport",
+				"bungcip.better-toml",
+				"streetsidesoftware.code-spell-checker",
+				"ms-vscode.vscode-typescript-next",
+				"esbenp.prettier-vscode",
+				"rvest.vs-code-prettier-eslint",
+				"ZixuanChen.vitest-explorer",
+				"Vue.volar",
+				"adpyke.codesnap"
 			]
 		}
 	},
-	"forwardPorts": [8080],
+	"forwardPorts": [
+		8080
+	],
 	"remoteUser": "root"
 }
