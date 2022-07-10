@@ -29,5 +29,9 @@
 	"forwardPorts": [
 		8080
 	],
-	"remoteUser": "root"
+	"remoteUser": "root",
+	"mounts": [
+		"source=vscode-server,target=/root/.vscode-server,type=volume",
+		"source=pnpm-store,target=/root/.local/share/pnpm/store,type=volume"
+	]
 }
