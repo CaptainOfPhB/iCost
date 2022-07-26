@@ -1,17 +1,12 @@
-import User from '../views/User';
-import Login from '../views/login';
-import { Tags, Tag } from '../views/tags';
-import Statistics from '../views/statistics';
-import { Accounts, Account } from '../views/accounts';
-
 const routes = [
-  { path: '/login', component: Login },
-  { path: '/tags', component: Tags },
-  { path: '/tags/:id', component: Tag },
-  { path: '/accounts', component: Accounts },
-  { path: '/accounts/:id', component: Account },
-  { path: '/user/:userId', name: 'user', component: User },
-  { path: '/statistics', component: Statistics },
+  { path: '/', redirect: '/accounts' },
+  { path: '/user', component: () => import('../views/user') },
+  { path: '/login', component: () => import('../views/login') },
+  { path: '/statistics', component: () => import('../views/statistics') },
+  { path: '/tags', component: () => import('../views/tags/Tags.vue') },
+  { path: '/tags/:tagId(\\d+)', component: () => import('../views/tags/Tag.vue') },
+  { path: '/accounts', component: () => import('../views/accounts/Accounts.vue') },
+  { path: '/accounts/:accountId(\\d+)', component: () => import('../views/accounts/Account.vue') },
 ];
 
 export default routes;
