@@ -1,4 +1,7 @@
 {
+  "ignorePatterns": [
+    "components.d.ts"
+  ],
   "extends": [
     "plugin:vue/base",
     "eslint:recommended",
