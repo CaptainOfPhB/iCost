@@ -2,6 +2,10 @@
   "ignorePatterns": [
     "components.d.ts"
   ],
+  "parserOptions": {
+    "parser": "@typescript-eslint/parser",
+    "sourceType": "module"
+  },
   "extends": [
     "plugin:vue/base",
     "eslint:recommended",
