@@ -8,7 +8,7 @@ Vue, Vue Router, Pinia, Axios, TypeScript, and Vite.
 
 ## TODOs
 
-- [ ] eslint and prettier
 - [ ] unit tests
-- [ ] home page is Accounts page
 - [ ] redirect to login page if not logged in
+- [ ] run lint and test before commit
+- [ ] github CI
