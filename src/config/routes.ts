@@ -1,7 +1,7 @@
 const routes = [
   { path: '/', redirect: '/accounts' },
   { path: '/user', component: () => import('../views/user') },
-  { path: '/login', component: () => import('../views/login') },
+  { path: '/login', meta: { transition: 'van-slide-down' }, component: () => import('../views/login') },
   { path: '/statistics', component: () => import('../views/statistics') },
   { path: '/tags', component: () => import('../views/tags/Tags.vue') },
   { path: '/tags/:tagId(\\d+)', component: () => import('../views/tags/Tag.vue') },
