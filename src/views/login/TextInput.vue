@@ -1,5 +1,11 @@
 <script lang='ts'>
+import { defineProps } from 'vue';
 
+interface TextInputProps {
+  placeholder?: string;
+}
+
+defineProps<TextInputProps>();
 </script>
 
 <template>
@@ -13,10 +19,10 @@
 .iCost_text_input {
   height: 50px;
   display: flex;
-  padding: 5px;
+  padding: 10px;
+  align-items: center;
   font-size: 16px;
   border-radius: 5px;
-  border: 1px solid gray;
   background-color: @primary-background-color-light;
 
   &:focus {

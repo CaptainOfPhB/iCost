@@ -66,7 +66,7 @@ html, body {
   &--active {
     .van-tabbar-item__icon {
       padding: 5px 20px;
-      background-color: @primary-theme-color-3;
+      background-color: @primary-theme-color-4;
     }
   }
 }
