@@ -1,6 +1,7 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@originjs/vite-plugin-global-style': ^1.0.2
   '@typescript-eslint/parser': ^5.31.0
   '@vitejs/plugin-vue': ^2.3.3
   eslint: ^8.20.0
@@ -26,6 +27,7 @@ dependencies:
   vue-router: 4.1.2_vue@3.2.37
 
 devDependencies:
+  '@originjs/vite-plugin-global-style': 1.0.2
   '@typescript-eslint/parser': 5.31.0_he2ccbldppg44uulnyq4rwocfa
   '@vitejs/plugin-vue': 2.3.3_vite@2.9.13+vue@3.2.37
   eslint: 8.20.0
@@ -115,6 +117,10 @@ packages:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.13.0
+    dev: true
+
+  /@originjs/vite-plugin-global-style/1.0.2:
+    resolution: {integrity: sha512-eYHeM4gscG8TgDN0bG7X/5zKO9d9Mc1oEEAbXuMAcKsi9Xsmwp3KZD+b5mfxsbPh+znwdUMVP5zNBInKRSBpPA==}
     dev: true
 
   /@popperjs/core/2.11.5:
