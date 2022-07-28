@@ -1,5 +1,14 @@
 <script setup lang='ts'>
-import TextInput from './TextInput.vue';
+import { ref } from 'vue';
+import TextInput from '../../components/TextInput';
+
+const verifyCode = ref<string>();
+const emailAddress = ref<string>();
+
+function login() {
+  console.log(emailAddress.value);
+  console.log(verifyCode.value);
+}
 </script>
 
 <template>
@@ -10,12 +19,21 @@ import TextInput from './TextInput.vue';
       <span>COST</span>
     </div>
     <div class='login-form'>
-      <text-input>
+      <text-input
+        v-model='emailAddress'
+        type='email'
+        :required='true'
+        class='email-address'
+        placeholder='Email Address'
+        :validate='/^[\S\d.]+@[\S\d]+\.[\S\d]+$/g'
+        validate-message='Please enter a valid email address'
+      />
+      <text-input v-model='verifyCode' class='verify-code' placeholder='Verify Code'>
         <template #extra>
           <div class='send-code-button'>Send Code</div>
         </template>
       </text-input>
-      <div class='submit-button'>LOGIN</div>
+      <div class='submit-button' @click='login'>LOGIN</div>
     </div>
   </div>
 </template>
@@ -55,7 +73,7 @@ import TextInput from './TextInput.vue';
 .send-code-button {
   padding: 8px 10px;
   text-align: center;
-  border-radius: 3px;
+  border-radius: 2px;
   background-color: white;
   box-shadow: 0 0 80px 0 rgba(100, 100, 100, .4);
 }
@@ -68,7 +86,6 @@ import TextInput from './TextInput.vue';
   text-align: center;
   font-weight: bold;
   border-radius: 5px;
-  margin-top: 20px;
   background-color: @primary-theme-color-2;
   box-shadow: 0 0 30px 0 rgba(40, 216, 161, 0.5);
 }
