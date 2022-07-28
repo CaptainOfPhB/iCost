@@ -2,15 +2,20 @@
 import { defineProps, ref } from 'vue';
 import typeOf from '../../utils/typeOf';
 
-const props = defineProps({
-  trim: { type: Boolean, default: false },
-  required: { type: Boolean, default: false },
-  type: { type: String, default: 'text' },
-  validate: { type: [Function, RegExp], default: undefined },
-  validateMessage: { type: String, default: undefined },
-  modelValue: { type: String, default: undefined },
-  disabled: { type: Boolean, default: false },
-  placeholder: { type: String, default: '' },
+interface Props {
+  trim?: boolean;
+  type?: string;
+  required?: boolean;
+  validate?: (() => void) | RegExp;
+  validateMessage?: string;
+  disabled?: boolean;
+  placeholder?: string;
+  modelValue: { value?: string, error?: string };
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  type: 'text',
+  modelValue: () => ({ value: undefined, error: undefined }),
 });
 
 const emit = defineEmits(['update:modelValue']);
@@ -18,28 +23,31 @@ const emit = defineEmits(['update:modelValue']);
 const error = ref<string>();
 
 function onInput(event: Event) {
+  error.value = undefined;
   const target = event.target as HTMLInputElement;
   const value = props.trim ? target.value.trim() : target.value;
-  emit('update:modelValue', target.value);
   throwErrorWhenRequired(value);
   throwErrorWhenValidateFailed(value);
-  error.value = '';
+  emit(
+    'update:modelValue',
+    { value: target.value, error: error.value },
+  );
 }
 
 function throwErrorWhenRequired(value: string) {
+  if (error.value !== undefined) return;
   if (props.required && value.length === 0) {
     error.value = 'This field is required';
-    throw new Error(error.value);
   }
 }
 
 function throwErrorWhenValidateFailed(value: string) {
+  if (error.value !== undefined) return;
   if (!props.validate) return;
   const condition1 = typeOf(props.validate) === 'Function' && !(props.validate as Function)(value);
   const condition2 = typeOf(props.validate) === 'RegExp' && !(props.validate as RegExp).exec(value);
   if (condition1 || condition2) {
     error.value = props.validateMessage || 'This field is invalid';
-    throw new Error(error.value);
   }
 }
 </script>
@@ -49,8 +57,8 @@ function throwErrorWhenValidateFailed(value: string) {
     <div :class='["body", error ? "has-error":""]'>
       <input
         :type='type'
-        :value='modelValue'
         :disabled='disabled'
+        :value='modelValue.value'
         :placeholder='placeholder'
         @input='onInput'
       />
