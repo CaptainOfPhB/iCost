@@ -1,9 +1,18 @@
 <script setup lang='ts'>
 import { ref } from 'vue';
 import TextInput from '../../components/TextInput';
+import useCountDown from '../../hooks/useCountDown/useCountDown';
 
 const verifyCode = ref<string>();
 const emailAddress = ref<string>();
+
+const { count, pending, startCountDown } = useCountDown(3, true);
+
+function sendCode() {
+  if (pending.value) return;
+  // TODO: request api.sendCode
+  startCountDown();
+}
 
 function login() {
   console.log(emailAddress.value);
@@ -28,9 +37,22 @@ function login() {
         :validate='/^[\S\d.]+@[\S\d]+\.[\S\d]+$/g'
         validate-message='Please enter a valid email address'
       />
-      <text-input v-model='verifyCode' class='verify-code' placeholder='Verify Code'>
+      <text-input
+        v-model='verifyCode'
+        class='verify-code'
+        placeholder='Verify Code'
+        :required='true'
+        :validate='/^\d{6}$/g'
+        validate-message='Please enter a 6-bits verify code'
+      >
         <template #extra>
-          <div class='send-code-button'>Send Code</div>
+          <div
+            :class='["send-code-button", pending ? "disabled":""]'
+            @click='sendCode'
+          >
+            <span v-if='pending' class='resend-text'>Resend({{ count }}s)</span>
+            <span v-else>Send Code</span>
+          </div>
         </template>
       </text-input>
       <div class='submit-button' @click='login'>LOGIN</div>
@@ -71,11 +93,22 @@ function login() {
 }
 
 .send-code-button {
-  padding: 8px 10px;
+  width: 110px;
+  padding: 8px 0;
   text-align: center;
   border-radius: 2px;
   background-color: white;
+  transition: all 0.5s ease-in-out;
   box-shadow: 0 0 80px 0 rgba(100, 100, 100, .4);
+
+  &.disabled {
+    box-shadow: none;
+    background-color: @primary-background-color-light;
+  }
+
+  .resend-text {
+    color: @primary-text-color-light;
+  }
 }
 
 .submit-button {
