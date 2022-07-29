@@ -3,8 +3,11 @@ import { ref } from 'vue';
 import TextInput from '../../components/TextInput';
 import useCountDown from '../../hooks/useCountDown/useCountDown';
 
-const verifyCode = ref<string>();
-const emailAddress = ref<string>();
+type Value = { value?: string; valid?: boolean; }
+
+const check = ref<boolean>(false);
+const verifyCode = ref<Value>({ valid: false });
+const emailAddress = ref<Value>({ valid: false });
 
 const { count, pending, startCountDown } = useCountDown(3, true);
 
@@ -15,8 +18,11 @@ function sendCode() {
 }
 
 function login() {
-  console.log(emailAddress.value);
-  console.log(verifyCode.value);
+  // trigger TextInput to validate it's value
+  check.value = true;
+  if (!emailAddress.value?.valid || !verifyCode.value?.valid) return;
+  console.log(emailAddress.value?.value);
+  console.log(verifyCode.value?.value);
 }
 </script>
 
@@ -31,6 +37,7 @@ function login() {
       <text-input
         v-model='emailAddress'
         type='email'
+        :check='check'
         :required='true'
         class='email-address'
         placeholder='Email Address'
@@ -40,6 +47,7 @@ function login() {
       <text-input
         v-model='verifyCode'
         class='verify-code'
+        :check='check'
         placeholder='Verify Code'
         :required='true'
         :validate='/^\d{6}$/g'
@@ -56,6 +64,7 @@ function login() {
         </template>
       </text-input>
       <div class='submit-button' @click='login'>LOGIN</div>
+      <div class='tips'>If you are not registered, we will register your email automatically via login.</div>
     </div>
   </div>
 </template>
@@ -67,12 +76,12 @@ function login() {
   padding: @primary-padding;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
   background-color: white;
 }
 
 .banner {
   width: 200px;
+  margin-top: 30px;
 }
 
 .logo {
@@ -121,5 +130,11 @@ function login() {
   border-radius: 5px;
   background-color: @primary-theme-color-2;
   box-shadow: 0 0 30px 0 rgba(40, 216, 161, 0.5);
+}
+
+.tips {
+  font-size: 14px;
+  margin-top: 8px;
+  color: @primary-text-color;
 }
 </style>

@@ -1,48 +1,55 @@
 <script setup lang='ts'>
-import { defineProps, ref } from 'vue';
+import { defineProps, ref, watch } from 'vue';
 import typeOf from '../../utils/typeOf';
 
-interface Props {
-  trim?: boolean;
-  type?: string;
-  required?: boolean;
-  validate?: (() => void) | RegExp;
-  validateMessage?: string;
-  disabled?: boolean;
-  placeholder?: string;
-  modelValue: { value?: string, error?: string };
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  type: 'text',
-  modelValue: () => ({ value: undefined, error: undefined }),
+const props = defineProps({
+  placeholder: { type: String },
+  trim: { type: Boolean, default: false },
+  type: { type: String, default: 'text' },
+  required: { type: Boolean, default: false },
+  validate: { type: [Function, RegExp] },
+  validateMessage: { type: String },
+  disabled: { type: Boolean, default: false },
+  check: { type: Boolean, default: false },
+  modelValue: { type: Object, default: () => ({ value: undefined, valid: false }) },
 });
 
 const emit = defineEmits(['update:modelValue']);
+
+watch(() => props.check, (check: boolean) => {
+  if (!check) return;
+  error.value = undefined;
+  const { trim, modelValue } = props;
+  setValue(trim ? modelValue.value?.trim() : modelValue.value);
+});
 
 const error = ref<string>();
 
 function onInput(event: Event) {
   error.value = undefined;
   const target = event.target as HTMLInputElement;
-  const value = props.trim ? target.value.trim() : target.value;
+  setValue(props.trim ? target.value.trim() : target.value);
+}
+
+function setValue(value?: string) {
   throwErrorWhenRequired(value);
   throwErrorWhenValidateFailed(value);
   emit(
     'update:modelValue',
-    { value: target.value, error: error.value },
+    { value, valid: error.value === undefined },
   );
 }
 
-function throwErrorWhenRequired(value: string) {
+function throwErrorWhenRequired(value?: string) {
   if (error.value !== undefined) return;
-  if (props.required && value.length === 0) {
+  if (props.required && [undefined, ''].includes(value)) {
     error.value = 'This field is required';
   }
 }
 
-function throwErrorWhenValidateFailed(value: string) {
+function throwErrorWhenValidateFailed(value?: string) {
   if (error.value !== undefined) return;
+  if (value === undefined) return;
   if (!props.validate) return;
   const condition1 = typeOf(props.validate) === 'Function' && !(props.validate as Function)(value);
   const condition2 = typeOf(props.validate) === 'RegExp' && !(props.validate as RegExp).exec(value);
