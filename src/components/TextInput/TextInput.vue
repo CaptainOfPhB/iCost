@@ -1,78 +1,33 @@
 <script setup lang='ts'>
-import { defineProps, ref, watch } from 'vue';
-import typeOf from '../../utils/typeOf';
+import { defineProps, type PropType, ref, watch } from 'vue';
+import { type ValidateError } from 'async-validator';
 
 const props = defineProps({
+  modelValue: { type: String },
   placeholder: { type: String },
-  trim: { type: Boolean, default: false },
-  type: { type: String, default: 'text' },
-  required: { type: Boolean, default: false },
-  validate: { type: [Function, RegExp] },
-  validateMessage: { type: String },
-  disabled: { type: Boolean, default: false },
-  check: { type: Boolean, default: false },
-  modelValue: { type: Object, default: () => ({ value: undefined, valid: false }) },
+  errors: { type: Array as PropType<ValidateError[]> },
 });
 
 const emit = defineEmits(['update:modelValue']);
 
-watch(() => props.check, (check: boolean) => {
-  if (!check) return;
-  error.value = undefined;
-  const { trim, modelValue } = props;
-  setValue(trim ? modelValue.value?.trim() : modelValue.value);
-});
+const touched = ref<boolean>(false);
 
-const error = ref<string>();
+watch(() => props.modelValue, () => touched.value = true);
 
 function onInput(event: Event) {
-  error.value = undefined;
   const target = event.target as HTMLInputElement;
-  setValue(props.trim ? target.value.trim() : target.value);
-}
-
-function setValue(value?: string) {
-  throwErrorWhenRequired(value);
-  throwErrorWhenValidateFailed(value);
-  emit(
-    'update:modelValue',
-    { value, valid: error.value === undefined },
-  );
-}
-
-function throwErrorWhenRequired(value?: string) {
-  if (error.value !== undefined) return;
-  if (props.required && [undefined, ''].includes(value)) {
-    error.value = 'This field is required';
-  }
-}
-
-function throwErrorWhenValidateFailed(value?: string) {
-  if (error.value !== undefined) return;
-  if (value === undefined) return;
-  if (!props.validate) return;
-  const condition1 = typeOf(props.validate) === 'Function' && !(props.validate as Function)(value);
-  const condition2 = typeOf(props.validate) === 'RegExp' && !(props.validate as RegExp).exec(value);
-  if (condition1 || condition2) {
-    error.value = props.validateMessage || 'This field is invalid';
-  }
+  emit('update:modelValue', target.value);
 }
 </script>
 
 <template>
   <div class='iCost_text_input'>
-    <div :class='["body", error ? "has-error":""]'>
-      <input
-        :type='type'
-        :disabled='disabled'
-        :value='modelValue.value'
-        :placeholder='placeholder'
-        @input='onInput'
-      />
+    <div :class='["body", touched && errors ? "has-error" : ""]'>
+      <input type='text' :value='modelValue' :placeholder='placeholder' @input='onInput' />
       <slot name='extra' />
     </div>
     <transition name='van-fade' mode='out-in'>
-      <div v-if='error' class='error'>{{ error }}</div>
+      <div v-if='touched && errors && errors.length' class='error'>{{ errors[0].message }}</div>
     </transition>
   </div>
 </template>

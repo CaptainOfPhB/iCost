@@ -1,15 +1,31 @@
 <script setup lang='ts'>
-import { ref } from 'vue';
+import 'vant/es/notify/style';
+import { showNotify } from 'vant';
+import { reactive, Ref } from 'vue';
 import TextInput from '../../components/TextInput';
+import type { Rules, ValidateError } from 'async-validator';
 import useCountDown from '../../hooks/useCountDown/useCountDown';
+import { useAsyncValidator } from '@vueuse/integrations/useAsyncValidator';
 
-type Value = { value?: string; valid?: boolean; }
+type Value = { emailAddress: string; verifyCode: string; }
 
-const check = ref<boolean>(false);
-const verifyCode = ref<Value>({ valid: false });
-const emailAddress = ref<Value>({ valid: false });
+const form = reactive({ emailAddress: '', verifyCode: '' });
+
+const transform = (value: string) => value.trim();
+const rules: Rules = {
+  emailAddress: [
+    { required: true, transform, message: 'Email is required' },
+    { type: 'email', transform, whitespace: true, message: 'Email is not valid' },
+  ],
+  verifyCode: [
+    { required: true, transform, message: 'Verify code is required' },
+    { len: 6, transform, pattern: /^\d{6}$/g, message: 'Verify code must be 6 digits number' },
+  ],
+};
 
 const { count, pending, startCountDown } = useCountDown(3, true);
+const validateResult = useAsyncValidator(form, rules);
+const errors = validateResult.errorFields as Ref<Record<keyof Value, ValidateError[]>>;
 
 function sendCode() {
   if (pending.value) return;
@@ -18,11 +34,11 @@ function sendCode() {
 }
 
 function login() {
-  // trigger TextInput to validate it's value
-  check.value = true;
-  if (!emailAddress.value?.valid || !verifyCode.value?.valid) return;
-  console.log(emailAddress.value?.value);
-  console.log(verifyCode.value?.value);
+  if (!validateResult.pass.value) {
+    showNotify({ type: 'danger', message: 'The login parameters are not valid' });
+    return;
+  }
+  showNotify(JSON.stringify(form));
 }
 </script>
 
@@ -34,25 +50,8 @@ function login() {
       <span>COST</span>
     </div>
     <div class='login-form'>
-      <text-input
-        v-model='emailAddress'
-        type='email'
-        :check='check'
-        :required='true'
-        class='email-address'
-        placeholder='Email Address'
-        :validate='/^[\S\d.]+@[\S\d]+\.[\S\d]+$/g'
-        validate-message='Please enter a valid email address'
-      />
-      <text-input
-        v-model='verifyCode'
-        class='verify-code'
-        :check='check'
-        placeholder='Verify Code'
-        :required='true'
-        :validate='/^\d{6}$/g'
-        validate-message='Please enter a 6-bits verify code'
-      >
+      <text-input v-model='form.emailAddress' placeholder='Email Address' :errors='errors.emailAddress' />
+      <text-input v-model='form.verifyCode' placeholder='Verify Code' :errors='errors.verifyCode'>
         <template #extra>
           <div
             :class='["send-code-button", pending ? "disabled":""]'
@@ -136,5 +135,9 @@ function login() {
   font-size: 14px;
   margin-top: 8px;
   color: @primary-text-color;
+}
+
+.van-notify--danger {
+  background-color: @primary-red-color-light;
 }
 </style>
