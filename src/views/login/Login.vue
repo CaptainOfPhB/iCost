@@ -2,9 +2,9 @@
 import 'vant/es/notify/style';
 import { showNotify } from 'vant';
 import { reactive, Ref } from 'vue';
-import TextInput from '../../components/TextInput';
+import { read } from '@/utils/axios';
 import type { Rules, ValidateError } from 'async-validator';
-import useCountDown from '../../hooks/useCountDown/useCountDown';
+import useCountDown from '@/hooks/useCountDown/useCountDown';
 import { useAsyncValidator } from '@vueuse/integrations/useAsyncValidator';
 
 type Value = { emailAddress: string; verifyCode: string; }
@@ -33,37 +33,35 @@ function sendCode() {
   startCountDown();
 }
 
-function login() {
+async function login() {
   if (!validateResult.pass.value) {
     showNotify({ type: 'danger', message: 'The login parameters are not valid' });
     return;
   }
-  showNotify(JSON.stringify(form));
+  const response = await read({ url: '/tags' });
+  console.log(response);
 }
 </script>
 
 <template>
-  <div class='iCost_login_page'>
-    <img class='banner' src='../../assets/banner.svg' alt='banner'>
-    <div class='logo'>
-      <span class='letter-i'>i</span>
+  <div class="iCost_login_page">
+    <img class="banner" src="@/assets/banner.svg" alt="banner" />
+    <div class="logo">
+      <span class="letter-i">i</span>
       <span>COST</span>
     </div>
-    <div class='login-form'>
-      <text-input v-model='form.emailAddress' placeholder='Email Address' :errors='errors.emailAddress' />
-      <text-input v-model='form.verifyCode' placeholder='Verify Code' :errors='errors.verifyCode'>
+    <div class="login-form">
+      <text-input v-model="form.emailAddress" placeholder="Email Address" :errors="errors.emailAddress" />
+      <text-input v-model="form.verifyCode" placeholder="Verify Code" :errors="errors.verifyCode">
         <template #extra>
-          <div
-            :class='["send-code-button", pending ? "disabled":""]'
-            @click='sendCode'
-          >
-            <span v-if='pending' class='resend-text'>Resend({{ count }}s)</span>
+          <div :class="['send-code-button', pending ? 'disabled' : '']" @click="sendCode">
+            <span v-if="pending" class="resend-text">Resend({{ count }}s)</span>
             <span v-else>Send Code</span>
           </div>
         </template>
       </text-input>
-      <div class='submit-button' @click='login'>LOGIN</div>
-      <div class='tips'>If you are not registered, we will register your email automatically via login.</div>
+      <div class="submit-button" @click="login">LOGIN</div>
+      <div class="tips">If you are not registered, we will register your email automatically via login.</div>
     </div>
   </div>
 </template>
@@ -107,7 +105,7 @@ function login() {
   border-radius: 2px;
   background-color: white;
   transition: all 0.5s ease-in-out;
-  box-shadow: 0 0 80px 0 rgba(100, 100, 100, .4);
+  box-shadow: 0 0 80px 0 rgba(100, 100, 100, 0.4);
 
   &.disabled {
     box-shadow: none;
