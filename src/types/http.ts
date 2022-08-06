@@ -1,9 +1,9 @@
 export interface RequestSchema {
-  intact?: boolean;
+  notify?: boolean;
 }
 
-export type ResponseSchema<D = unknown, E = unknown> = {
-  data: D | null;
-  error: E | null;
+export type ResponseSchema<D = unknown> = {
   status: 'success' | 'error';
+  data: D | null;
+  error: Record<string, string> | null;
 }
