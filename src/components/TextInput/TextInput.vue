@@ -1,6 +1,6 @@
 <script setup lang='ts'>
-import { defineProps, type PropType, ref, watch } from 'vue';
-import { type ValidateError } from 'async-validator';
+import { PropType, ref, watch } from 'vue';
+import { ValidateError } from 'async-validator';
 
 const props = defineProps({
   modelValue: { type: String },
