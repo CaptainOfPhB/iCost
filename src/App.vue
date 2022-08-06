@@ -1,5 +1,6 @@
 <script setup lang='ts'>
 import { ref } from 'vue';
+import 'vant/es/notify/style';
 import { themeVars } from './config/vantThemeOverride';
 import { useRouter, RouteLocationNormalized } from 'vue-router';
 
