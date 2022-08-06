@@ -7,6 +7,11 @@ import globalStyle from '@originjs/vite-plugin-global-style';
 import { VantResolver } from 'unplugin-vue-components/resolvers';
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@': '/src',
+    }
+  },
   plugins: [
     vue(),
     eslint(),
