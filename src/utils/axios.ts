@@ -1,5 +1,5 @@
 import { showNotify } from 'vant'
-import { RequestSchema, ResponseSchema } from '../types/http';
+import { RequestSchema, ResponseSchema } from '@/types/http';
 import Axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 type AxiosRequest<D = any> = RequestSchema & AxiosRequestConfig<D>;
@@ -13,26 +13,33 @@ const axios = Axios.create({ baseURL, headers, timeout });
 axios.interceptors.response.use(
   (axiosResponse: AxiosResponse) => axiosResponse.data,
   (axiosError: AxiosError<ResponseSchema>) => {
-    const { response } = axiosError;
+    const response = handleResponse(axiosError);
     const config = axiosError.config as AxiosRequest;
-    const isUnhandledException = typeof response?.data === 'string';
-    const error = isUnhandledException
-      ? { UnhandledException: axiosError.message }
-      : response?.data.error!;
     if (config.notify !== false) {
-      const messages = Object.values(error);
+      const messages = Object.values(response.error!);
       messages.length === 1
         ? showNotify(messages[0])
         : showNotify({
           message: messages.map((msg: string, idx: number) => `${idx + 1}. ${msg}`).join('\n')
         });
     }
-    // request error such as 404 will return rails html string response
-    return isUnhandledException
-      ? { status: 'error', data: null, error }
-      : response?.data;
+    return response;
   },
 );
+
+function handleResponse(axiosError: AxiosError<ResponseSchema>): ResponseSchema {
+  switch (typeof axiosError.response?.data) {
+    // 1. request error such as 404 will return rails html string response
+    // 2. network error will cause axiosError.response.data to be undefined
+    case 'string':
+    case 'undefined': return {
+      data: null,
+      status: 'error',
+      error: { UnhandledExceptionOrNetworkError: axiosError.message }
+    };
+    default: return axiosError.response!.data;
+  }
+}
 
 const http = (params: AxiosRequest) => axios(params);
 
